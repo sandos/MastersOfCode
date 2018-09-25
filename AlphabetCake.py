@@ -4,14 +4,14 @@ R = 0
 C = 0
 test_cases = 0
 
-map = None
+board = None
 
 itr = 0
 case = 1
 
-def solve(map):
+def solve(m):
     #Pass 1 - Expand in both directions
-    for l in map:
+    for l in m:
         lastC = " "
         for idx in range(len(l)):
             c = l[idx]
@@ -35,9 +35,9 @@ def solve(map):
     found = True
     while found:
         found = False
-        for idx in range(len(map)-1):
+        for idx in range(len(m)-1):
             empty = True
-            for c in map[idx]:
+            for c in m[idx]:
                 if c != "?" and c != " ":
                     empty = False
 
@@ -46,11 +46,11 @@ def solve(map):
                 #Copy from above or below
                 #print "Empty line detected: " + str(l)
                 #Copy from above
-                map[idx] = map[idx+1]
+                m[idx] = m[idx+1]
 
-        for idx in range(len(map)-1, 0, -1):
+        for idx in range(len(m)-1, 0, -1):
             empty = True
-            for c in map[idx]:
+            for c in m[idx]:
                 if c != "?" and c != " ":
                     empty = False
 
@@ -59,7 +59,7 @@ def solve(map):
                 #Copy from above or below
                 #print "Empty line detected: " + str(l)
                 #Copy from above
-                map[idx] = map[idx-1]
+                m[idx] = m[idx-1]
 
 
 for line in file:
@@ -69,7 +69,7 @@ for line in file:
             test_cases = int(spl[0])
         elif R > 0 and C > 0:
             #print spl[0]
-            map[itr] = list(spl[0].strip())
+            board[itr] = list(spl[0].strip())
             # for u, c in enumerate(spl[0]):
             #     if c == "\n" or c == "\r" or c == " ":
             #         continue
@@ -82,9 +82,9 @@ for line in file:
                     # print "".join(l)
 
                 # print("-------------------------------------")
-                solve(map)
+                solve(board)
 
-                for l in map:
+                for l in board:
                     print "".join(l)
 
         else:
@@ -94,7 +94,7 @@ for line in file:
         R = int(spl[0])
         C = int(spl[1])
         itr = 0
-        map = ["" for i in range(R)]
+        board = ["" for i in range(R)]
 
         print "Case #" + str(case) + ":"
         case += 1
