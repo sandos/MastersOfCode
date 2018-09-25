@@ -4,7 +4,7 @@ R = 0
 C = 0
 test_cases = 0
 
-board = None
+board = []
 
 itr = 0
 case = 1
