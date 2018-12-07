@@ -111,3 +111,5 @@ sudoku/.lein-repl-history
 sudoku/.nrepl-port
 sudoku/DotNetSolver/DotNetSolver/bin
 sudoku/DotNetSolver/DotNetSolver/obj
+sudoku/rust/solver/src/main.pdb
+sudoku/rust/solver/src/main.exe
