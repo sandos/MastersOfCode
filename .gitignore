@@ -107,3 +107,6 @@ venv.bak/
 output.out
 clojure/corelogictest/.lein-repl-history
 clojure/corelogictest/.lein-repl-history
+sudoku/.lein-repl-history
+sudoku/.nrepl-port
+sudoku/DotNetSolver/DotNetSolver/bin
