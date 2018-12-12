@@ -113,3 +113,4 @@ sudoku/DotNetSolver/DotNetSolver/bin
 sudoku/DotNetSolver/DotNetSolver/obj
 sudoku/rust/solver/src/main.pdb
 sudoku/rust/solver/src/main.exe
+sudoku/DotNetSolver/DotNetSolver.v11.suo
