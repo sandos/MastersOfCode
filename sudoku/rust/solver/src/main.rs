@@ -4,7 +4,6 @@ extern crate serde_derive;
 
 use std::error::Error;
 use std::io;
-use std::process;
 
 #[derive(Debug,Deserialize)]
 struct Record {
@@ -16,7 +15,11 @@ struct Board {
     brd: [u8; 81]
 }
 
-fn example() -> Result<(), Box<Error>> {
+fn example() -> Result<Box<Vec<Board>>, Box<Error>> {
+    let mut boards: Vec<Board> = vec![];
+
+    let mut num = 0;
+
     let mut rdr = csv::Reader::from_reader(io::stdin());
     for result in rdr.deserialize() {
         // Notice that we need to provide a type hint for automatic
@@ -30,18 +33,33 @@ fn example() -> Result<(), Box<Error>> {
         };
         let mut index: usize = 0;
         for c in record.quizzes.chars() {
-            print!("{}", c);
+            //print!("{}", c);
             board.brd[index] = (c as u8) - 32;
             index += 1;
         }
-        println!("");
+        boards.insert(0, board);
+        //println!("x");
+
+        num += 1;
+
+        if num == 10 {
+            break;
+        }
     }
-    Ok(())
+    Ok(Box::new(boards))
 }
 
 fn main() {
-    if let Err(err) = example() {
-        println!("error running example: {}", err);
-        process::exit(1);
+    let r = example();
+
+    let f = match r {
+        Ok(result) => result,
+        Err(err) => {
+            panic!("There was a problem! {:?}", err)
+        },
+    };
+
+    for board in *f {
+        println!("{}", board.brd[0]);
     }
 }
