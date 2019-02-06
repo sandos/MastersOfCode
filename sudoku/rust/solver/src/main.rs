@@ -6,11 +6,10 @@ extern crate serde_derive;
 pub mod majs {
 
 use std::error::Error;
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 use std::fs::File;
-use std::path::{Path, PathBuf};
 
-use lz4::{Decoder, EncoderBuilder};
+use lz4::{Decoder};
 
 #[derive(Debug,Deserialize)]
 struct Record {
@@ -22,23 +21,33 @@ pub struct Board {
     pub brd: [u8; 81]
 }
 
-pub fn example() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
+pub fn pars() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
     let mut boards: Vec<Board> = vec![];
 
-    let mut num = 0;
+    //let mut num = 0;
 
     let input_file = File::open("C:/Users/SEJOBAC8/projs/MastersOfCode/sudoku/sudoku.lz4")?;
-    let mut decoder = Decoder::new(input_file)?;
+    let decoder = Decoder::new(input_file)?;
 
-    let f = BufReader::new(decoder);
-    let mut sum: i64 = 0;
-    for line in f.lines() {
-        let line: String = line.unwrap();
-        for byte in line.bytes() {
-            //print!("{}", byte);
-            sum += byte as i64;
+    let mut f = BufReader::new(decoder);
+    let mut line = String::new();
+    while f.read_line(&mut line).unwrap() > 0 {
+        if line.len() < 81 {
+            continue;
         }
-        //print!("{}\n", &line[0..1]);
+        //print!("{}\r\n", line);
+        let mut it = line.bytes();
+        let mut board = Board {
+            brd: [0; 81]
+        };
+        for x in 0..81 {
+            board.brd[x] = it.next().unwrap();
+
+        }
+        //it.skip(1);
+
+        boards.push(board);
+        line.clear();
     }
 
     /*let mut rdr = csv::Reader::from_reader(io::stdin());
@@ -74,7 +83,7 @@ pub fn example() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
 }
 }
 fn main() {
-    let r = majs::example();
+    let r = majs::parse();
 
     let f = match r {
         Ok(result) => result,
@@ -83,8 +92,7 @@ fn main() {
         },
     };
 
-    for board in *f {
-        println!("{}", board.brd[0]);
-
-    }
+    // for board in *f {
+    //     println!("{}", board.brd[0]);
+    // }
 }
