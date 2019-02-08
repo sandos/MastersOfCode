@@ -3,8 +3,6 @@ extern crate lz4;
 #[macro_use]
 extern crate serde_derive;
 
-pub mod majs {
-
 use std::error::Error;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
@@ -18,10 +16,10 @@ struct Record {
 }
 
 pub struct Board {
-    pub brd: [u8; 81]
+    pub brd: [u16; 81]
 }
 
-pub fn pars() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
+pub fn parse() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
     let mut boards: Vec<Board> = vec![];
 
     //let mut num = 0;
@@ -41,7 +39,11 @@ pub fn pars() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
             brd: [0; 81]
         };
         for x in 0..81 {
-            board.brd[x] = it.next().unwrap();
+            let v = it.next().unwrap() - 48;
+            if v > 0 {
+                board.brd[x] = 1 << (v-1);
+                //print!("{} {:09b} ", v, board.brd[x])
+            }
 
         }
         //it.skip(1);
@@ -50,40 +52,55 @@ pub fn pars() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
         line.clear();
     }
 
-    /*let mut rdr = csv::Reader::from_reader(io::stdin());
-    for result in rdr.deserialize() {
-        // Notice that we need to provide a type hint for automatic
-        // deserialization.
+    Ok(Box::new(boards))
+}
 
-        let record: Record = result?;
+pub fn solve(board: Board) -> Result<u32, Box<Error>> {
 
-        //println!("{:?}", record);
-        let mut board = Board {
-            brd: [0; 81]
-        };
-        let mut index: usize = 0;
-        for c in record.quizzes.chars() {
-            //print!("{}", c);
-            //board.brd[index] = (c as u8) - 32;
-            index += 1;
+    //Create constraints for every cell
+    // bit 0 - 8 means 1...9 is still possible
+    let mut constraints: [u16; 81] = [0; 81];
+
+    for row in 0..9 {
+        let mut mask: u16 = 0;
+        let mut addr = row * 9;
+        for col in 0..9 {
+            //print!("{} {} {}\n", row, col, addr);
+            mask |= board.brd[addr+col];
         }
-        boards.insert(0, board);
-        //println!("x");
+        for col in 0..9 {
+            constraints[addr+col] = mask;
+        }
+        //print!("{:08b}\n", mask);
+    }
 
-        num += 1;
+    for col in 0..9 {
+        let mut mask: u16 = board.brd[col];
+    }
 
-        if num == 10000 {
-            break;
+    for col in 0..9 {
+        let mut mask: u16 = 0;
+        for row in 0..9 {
+            mask |= board.brd[col + row*9];
+        }
+        for row in 0..9 {
+            constraints[col + row*9] |= mask;
         }
     }
-    */
-    Ok(Box::new(boards))
-    //return Result::Err(Box::new(Error("asdasd".into())));
-    //Err::new("adsasd");
+
+    for row in 0..9 {
+        for col in 0..9 {
+            print!("{:09b}|{:3x} ", constraints[row*9+col], board.brd[row*9+col]);
+        }
+        print!("\n");
+    }
+    print!("\n");
+
+    return Result::Ok(0);
 }
-}
+
 fn main() {
-    let r = majs::parse();
+    let r = parse();
 
     let f = match r {
         Ok(result) => result,
@@ -92,7 +109,12 @@ fn main() {
         },
     };
 
-    // for board in *f {
-    //     println!("{}", board.brd[0]);
-    // }
+    for board in *f {
+        let _ = match solve(board) {
+            Ok(result) => result,
+            Err(err) => {
+                panic!("There was a problem {:?}", err)
+            }
+        };
+    }
 }
