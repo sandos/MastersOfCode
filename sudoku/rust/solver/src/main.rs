@@ -60,10 +60,11 @@ pub fn solve(board: Board) -> Result<u32, Box<Error>> {
     //Create constraints for every cell
     // bit 0 - 8 means 1...9 is still possible
     let mut constraints: [u16; 81] = [0; 81];
+    let mut counts: [u32; 81] = [0; 81];
 
     for row in 0..9 {
         let mut mask: u16 = 0;
-        let mut addr = row * 9;
+        let addr = row * 9;
         for col in 0..9 {
             //print!("{} {} {}\n", row, col, addr);
             mask |= board.brd[addr+col];
@@ -75,26 +76,38 @@ pub fn solve(board: Board) -> Result<u32, Box<Error>> {
     }
 
     for col in 0..9 {
-        let mut mask: u16 = board.brd[col];
-    }
-
-    for col in 0..9 {
         let mut mask: u16 = 0;
         for row in 0..9 {
             mask |= board.brd[col + row*9];
         }
         for row in 0..9 {
             constraints[col + row*9] |= mask;
+
+            //Population count here
+            counts[col + row*9] = mask.count_ones();
         }
     }
 
-    for row in 0..9 {
-        for col in 0..9 {
-            print!("{:09b}|{:3x} ", constraints[row*9+col], board.brd[row*9+col]);
+    let mut max = 0;
+    let mut pos = 0;
+    for a in 0..81 {
+        if max < counts[a] {
+            max = counts[a];
+            pos = a;
         }
-        print!("\n");
     }
-    print!("\n");
+
+    print!("{}:{} ", pos, max);
+
+    // for row in 0..9 {
+    //     for col in 0..9 {
+    //         print!("{:09b}|{:3x}|{} ", constraints[row*9+col], board.brd[row*9+col], counts[row*9+col]);
+    //     }
+    //     print!("\n");
+    // }
+    // print!("\n");
+
+
 
     return Result::Ok(0);
 }
