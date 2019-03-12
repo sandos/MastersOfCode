@@ -31,6 +31,7 @@ pub fn parse() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
     let mut line = String::new();
     while f.read_line(&mut line).unwrap() > 0 {
         if line.len() < 81 {
+            line.clear();
             continue;
         }
         //print!("{}\r\n", line);
@@ -42,14 +43,13 @@ pub fn parse() -> Result<Box<Vec<Board>>, Box<dyn Error>> {
             let v = it.next().unwrap() - 48;
             if v > 0 {
                 board.brd[x] = 1 << (v-1);
-                //print!("{} {:09b} ", v, board.brd[x])
             }
 
         }
-        //it.skip(1);
 
         boards.push(board);
         line.clear();
+        break;
     }
 
     Ok(Box::new(boards))
@@ -82,9 +82,10 @@ pub fn solve(board: Board) -> Result<u32, Box<Error>> {
         }
         for row in 0..9 {
             constraints[col + row*9] |= mask;
+            constraints[col + row*9] &= !board.brd[col+row*9];
 
             //Population count here
-            counts[col + row*9] = mask.count_ones();
+            counts[col + row*9] = constraints[col + row*9].count_ones();
         }
     }
 
@@ -97,17 +98,17 @@ pub fn solve(board: Board) -> Result<u32, Box<Error>> {
         }
     }
 
-    print!("{}:{} ", pos, max);
+    // if max == 9 {
+        print!("{}:{}|{}\n", pos, max, constraints[pos]);
 
-    // for row in 0..9 {
-    //     for col in 0..9 {
-    //         print!("{:09b}|{:3x}|{} ", constraints[row*9+col], board.brd[row*9+col], counts[row*9+col]);
-    //     }
-    //     print!("\n");
+        for row in 0..9 {
+            for col in 0..9 {
+                print!("{:09b}|{:04x}|{}  ", constraints[row*9+col], board.brd[row*9+col], counts[row*9+col]);
+            }
+            print!("\n");
+        }
+        print!("\n");
     // }
-    // print!("\n");
-
-
 
     return Result::Ok(0);
 }
@@ -129,5 +130,6 @@ fn main() {
                 panic!("There was a problem {:?}", err)
             }
         };
+        break;
     }
 }
